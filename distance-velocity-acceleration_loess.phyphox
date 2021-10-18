@@ -1,0 +1,212 @@
+<phyphox xmlns="http://phyphox.org/xml" version="1.14" locale="en">
+  <title>Distance, velocity, acceleration (LOESS)</title>
+  <category>LiDAR</category>
+  <description>Test experiment for LiDAR development: distance, velocity and acceleration derived by LOESS.</description>
+  <icon>dt</icon>
+  <translations>
+  </translations>
+    <data-containers>
+        <container size="0">x</container>
+        <container size="0">t</container>
+
+        <container size="1" init="0.02">dt</container>  <!-- Schrittweite für Glättung (kann normalerweise so bleiben) -->
+        <container size="1" init="0.2">d</container>    <!-- Breite der Glättung in Sekunden -->
+
+        <container size="0">tout</container>
+        <container size="0">xout</container>
+        <container size="0">vout</container>
+        <container size="0">aout</container>
+
+        <container size="0">toutpreview</container>
+        <container size="0">xoutpreview</container>
+        <container size="0">voutpreview</container>
+        <container size="0">aoutpreview</container>
+
+        <container size="1">newsmoothstart</container>
+        <container size="1">newsmoothstop</container>
+        <container size="1">tmaxsmooth</container>
+
+        <container size="101">newsmoothti100</container>
+        <container size="101">newsmoothti</container>
+        <container size="101">newsmoothxi</container>
+        <container size="101">newsmoothvi</container>
+        <container size="101">newsmoothai</container>
+
+        <container size="101">incompletesmoothti</container>
+        <container size="101">incompletesmoothxi</container>
+        <container size="101">incompletesmoothvi</container>
+        <container size="101">incompletesmoothai</container>
+
+        <container size="1">temp</container>
+
+    </data-containers>
+   <input>
+    <depth x1="0.4" x2="0.6" y1="0.4" y2="0.6" mode="average">
+      <output component="z">x</output>
+      <output component="t">t</output>
+    </depth>
+  </input>
+    <analysis>
+
+        <!-- Neue Stützstellen für Glättung suchen -->
+
+        <append>
+            <input type="value">0</input>
+            <input clear="false">tout</input>
+            <output>temp</output>               <!-- Letzter schon berechneter Glättungswert -->
+        </append>
+
+        <add>
+            <input>temp</input>
+            <input clear="false">dt</input>
+            <output>newsmoothstart</output>     <!-- Erster zu berechnender Glättungswert -->
+        </add>
+
+        <append>
+            <input type="value">0</input>
+            <input clear="false">t</input>
+            <output>temp</output>               <!-- Letzter Rohdatenwert, der schon aufgenommen wurde -->
+        </append>
+
+        <subtract>
+            <input>temp</input>
+            <input clear="false">d</input>
+            <output>tmaxsmooth</output>         <!-- Maximale Zeit, bis zu der eine Glättung schon sinnvoll wäre -->
+        </subtract>
+
+        <formula formula="[1]+100*[2]">
+            <input clear="false">newsmoothstart</input>
+            <input clear="false">dt</input>
+            <output>newsmoothstop</output>      <!-- Höchster der möglichen neuen Glättungswerte, der aber weit hinter den sinnvollen liegen kann -->
+        </formula>
+
+        <ramp>
+            <input as="start">newsmoothstart</input>
+            <input as="stop">newsmoothstop</input>
+            <output>newsmoothti100</output>     <!-- Mögliche neue Glättungswerte -->
+        </ramp>
+
+        <rangefilter>
+            <input clear="false">newsmoothti100</input>
+            <input as="max" clear="false">tmaxsmooth</input>
+            <output>newsmoothti</output>        <!-- Die Zeiten, zu denen wir nun wirklich glätten -->
+        </rangefilter>
+
+        <append>
+            <input type="value">0</input>
+            <input clear="false">t</input>
+            <output>temp</output>               <!-- Erneut letzter Rohdatenwert, der schon aufgenommen wurde -->
+        </append>
+
+        <rangefilter>
+            <input>newsmoothti100</input>
+            <input as="min" clear="false">tmaxsmooth</input>
+            <input as="max">temp</input>
+            <output>incompletesmoothti</output>        <!-- Die Zeiten für neuere Datenpunkt, die wir nur als Vorschau glätten -->
+        </rangefilter>
+
+        <!-- Glätten -->
+
+        <loess>
+            <input as="x" clear="false">t</input>
+            <input as="y" clear="false">x</input>
+            <input as="xi" clear="false">newsmoothti</input>
+            <input as="d" clear="false">d</input>
+            <output as="yi0">newsmoothxi</output>
+            <output as="yi1">newsmoothvi</output>
+            <output as="yi2">newsmoothai</output>
+        </loess>
+
+        <loess>
+            <input as="x" clear="false">t</input>
+            <input as="y" clear="false">x</input>
+            <input as="xi" clear="false">incompletesmoothti</input>
+            <input as="d" clear="false">d</input>
+            <output as="yi0">incompletesmoothxi</output>
+            <output as="yi1">incompletesmoothvi</output>
+            <output as="yi2">incompletesmoothai</output>
+        </loess>
+
+        <!-- Ergebnisse anhängen -->
+
+        <append>
+            <input>newsmoothti</input>
+            <output clear="false">tout</output>
+        </append>
+
+        <append>
+            <input>newsmoothxi</input>
+            <output clear="false">xout</output>
+        </append>
+
+        <append>
+            <input>newsmoothvi</input>
+            <output clear="false">vout</output>
+        </append>
+
+        <append>
+            <input>newsmoothai</input>
+            <output clear="false">aout</output>
+        </append>
+
+        <!-- Puffer mit finalen Ergebnissen und Vorschau-Ergebnissen -->
+
+        <append>
+            <input clear="false">tout</input>
+            <input clear="true">incompletesmoothti</input>
+            <output clear="true">toutpreview</output>
+        </append>
+
+        <append>
+            <input clear="false">xout</input>
+            <input clear="true">incompletesmoothxi</input>
+            <output clear="true">xoutpreview</output>
+        </append>
+
+        <append>
+            <input clear="false">vout</input>
+            <input clear="true">incompletesmoothvi</input>
+            <output clear="true">voutpreview</output>
+        </append>
+
+        <append>
+            <input clear="false">aout</input>
+            <input clear="true">incompletesmoothai</input>
+            <output clear="true">aoutpreview</output>
+        </append>
+
+    </analysis>
+    <views>
+        <view label="Daten">
+            <graph label="z(t)" partialUpdate="false" labelX="t" labelY="s" unitX="s" unitY="mm">
+                <input axis="x" lineWidth="2">toutpreview</input>
+                <input axis="y">xoutpreview</input>
+                <input axis="x" style="dots" color="white">t</input>
+                <input axis="y">x</input>
+            </graph>
+            <graph label="v(t)" partialUpdate="true" labelX="t" labelY="v" unitX="s" unitY="mm/s">
+                <input axis="x" lineWidth="2">toutpreview</input>
+                <input axis="y">voutpreview</input>
+            </graph>
+            <graph label="a(t)" partialUpdate="true" labelX="t" labelY="a" unitX="s" unitY="mm/s²">
+                <input axis="x" lineWidth="2">toutpreview</input>
+                <input axis="y">aoutpreview</input>
+            </graph>
+        </view>
+        <view label="Setup">
+          <depth-gui label="Control" />
+          <separator height="1" />
+          <edit label="Width of LOESS fit" unit="s" default="0.2">
+            <output>d</output>
+          </edit>
+        </view>
+    </views>
+    <export>
+        <set name="Data">
+            <data name="t">tout</data>
+            <data name="z">xout</data>
+            <data name="v">vout</data>
+            <data name="a">aout</data>
+        </set>
+    </export>
+</phyphox>
