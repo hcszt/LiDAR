@@ -1,0 +1,113 @@
+<phyphox version="1.14" locale="en">
+  <title>Distance, velocity, acceleration</title>
+  <category>LiDAR</category>
+  <description>Test experiment for LiDAR development.</description>
+  <icon>dt</icon>
+  <translations>
+  </translations>
+  <data-containers>
+    <container size="0">z</container>
+    <container size="0">v</container>
+    <container size="0">a</container>
+    <container size="0">t</container>
+    <container size="0">dt</container>
+    <container size="0">dt2</container>
+    <container size="0">temp1</container>
+    <container size="0">v_time</container>
+    <container size="0">a_time</container>
+  </data-containers>
+  <input>
+    <depth x1="0.4" x2="0.6" y1="0.4" y2="0.6" mode="average">
+      <output component="z">z</output>
+      <output component="t">t</output>
+    </depth>
+  </input>
+  <analysis>
+    <differentiate>
+      <input clear="false">t</input>
+      <output>dt</output>
+    </differentiate>
+    <divide>
+      <input clear="false">dt</input>
+      <input type="value">2</input>
+      <output>dt2</output>
+    </divide>
+    <match>
+      <input clear="false">t</input>
+      <input clear="false">dt2</input>
+      <output>temp1</output>
+    </match>
+    <add>
+      <input>temp1</input>
+      <input>dt2</input>
+      <output>v_time</output>
+    </add>
+    <differentiate>
+      <input clear="false">z</input>
+      <output>temp1</output>
+    </differentiate>
+    <divide>
+      <input>temp1</input>
+      <input>dt</input>
+      <output>v</output>
+    </divide>
+
+    <differentiate>
+      <input clear="false">v_time</input>
+      <output>dt</output>
+    </differentiate>
+    <divide>
+      <input clear="false">dt</input>
+      <input type="value">2</input>
+      <output>dt2</output>
+    </divide>
+    <match>
+      <input clear="false">t</input>
+      <input clear="false">dt2</input>
+      <output>temp1</output>
+    </match>
+    <add>
+      <input>temp1</input>
+      <input>dt2</input>
+      <output>a_time</output>
+    </add>
+    <differentiate>
+      <input clear="false">v</input>
+      <output>temp1</output>
+    </differentiate>
+    <divide>
+      <input>temp1</input>
+      <input>dt</input>
+      <output>a</output>
+    </divide>
+  </analysis>
+  <views>
+    <view label="Graph">
+      <graph label="Distance" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_distance]]" unitY="[[unit_short_meter]]" partialUpdate="true">
+        <input axis="x">t</input>
+        <input axis="y">z</input>
+      </graph>
+      <graph label="Velocity" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_velocity]]" unitY="[[unit_short_meter_per_second]]" partialUpdate="true">
+        <input axis="x">t</input>
+        <input axis="y">v</input>
+      </graph>
+      <graph label="Acceleration" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" partialUpdate="true">
+        <input axis="x">t</input>
+        <input axis="y">a</input>
+      </graph>
+    </view>
+    <view label="Setup">
+      <depth-gui label="Control" />
+    </view>
+  </views>
+  <export>
+    <set name="Raw Data">
+      <data name="Time (s)">t</data>
+      <data name="Distance (m)">z</data>
+      <data name="Time (s)">t</data>
+      <data name="Velocity (m/s)">v</data>
+      <data name="Time (s)">t</data>
+      <data name="Acceleration (m/s²)">a</data>
+    </set>
+  </export>
+</phyphox>
