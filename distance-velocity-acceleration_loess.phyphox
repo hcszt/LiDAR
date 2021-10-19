@@ -177,18 +177,18 @@
 
     </analysis>
     <views>
-        <view label="Daten">
-            <graph label="z(t)" partialUpdate="false" labelX="t" labelY="s" unitX="s" unitY="mm">
+        <view label="Graph">
+            <graph label="Distance" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_distance]]" unitY="[[unit_short_meter]]" partialUpdate="true">
                 <input axis="x" lineWidth="2">toutpreview</input>
                 <input axis="y">xoutpreview</input>
                 <input axis="x" style="dots" color="white">t</input>
                 <input axis="y">x</input>
             </graph>
-            <graph label="v(t)" partialUpdate="true" labelX="t" labelY="v" unitX="s" unitY="mm/s">
+            <graph label="Velocity" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_velocity]]" unitY="[[unit_short_meter_per_second]]" partialUpdate="true">
                 <input axis="x" lineWidth="2">toutpreview</input>
                 <input axis="y">voutpreview</input>
             </graph>
-            <graph label="a(t)" partialUpdate="true" labelX="t" labelY="a" unitX="s" unitY="mm/s²">
+            <graph label="Acceleration" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" partialUpdate="true">
                 <input axis="x" lineWidth="2">toutpreview</input>
                 <input axis="y">aoutpreview</input>
             </graph>
@@ -202,11 +202,13 @@
         </view>
     </views>
     <export>
-        <set name="Data">
-            <data name="t">tout</data>
-            <data name="z">xout</data>
-            <data name="v">vout</data>
-            <data name="a">aout</data>
+        <set name="Raw Data">
+            <data name="Time (s)">tout</data>
+            <data name="Distance (m)">xout</data>
+            <data name="Time (s)">tout</data>
+            <data name="Velocity (m/s)">vout</data>
+            <data name="Time (s)">tout</data>
+            <data name="Acceleration (m/s²)">aout</data>
         </set>
     </export>
 </phyphox>
