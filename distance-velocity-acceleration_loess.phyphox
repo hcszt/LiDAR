@@ -21,6 +21,7 @@
         <container size="0">xoutpreview</container>
         <container size="0">voutpreview</container>
         <container size="0">aoutpreview</container>
+        <container size="0">aoutpreview2</container>
 
         <container size="1">newsmoothstart</container>
         <container size="1">newsmoothstop</container>
@@ -175,6 +176,12 @@
             <output clear="true">aoutpreview</output>
         </append>
 
+        <multiply>
+            <input clear="false">aoutpreview</input>
+            <input type="value">2</input>
+            <output>aoutpreview2</output>
+        </multiply>
+
     </analysis>
     <views>
         <view label="Graph">
@@ -190,7 +197,7 @@
             </graph>
             <graph label="Acceleration" timeOnX="true" labelX="[[quantity_short_time]]" unitX="[[unit_short_second]]" labelY="[[quantity_short_acceleration]]" unitY="[[unit_short_meter_per_square_second]]" partialUpdate="true">
                 <input axis="x" lineWidth="2">toutpreview</input>
-                <input axis="y">aoutpreview</input>
+                <input axis="y">aoutpreview2</input>
             </graph>
         </view>
         <view label="Setup">
