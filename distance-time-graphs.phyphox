@@ -457,7 +457,7 @@
         </if>
 
         <if equal="true">
-            <input clear="true">plotselect</input>
+            <input clear="false">plotselect</input>
             <input type="value">9</input>
             <input clear="false">graph9_time</input>
             <output clear="true">reference_plot_time</output>
