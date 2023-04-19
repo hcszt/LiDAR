@@ -116,7 +116,7 @@
             <output component="t">tin</output>
         </depth>
     </input>
-    <analysis>
+    <analysis sleep="0.1">
 
         <multiply>
             <input clear="true">xinmeter</input>
